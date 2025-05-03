@@ -1,1 +1,1 @@
-# n8n scenario 2
+# n8n workflow 2

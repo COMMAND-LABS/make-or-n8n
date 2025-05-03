@@ -13,3 +13,8 @@ Driven by passion, Zuckerberg focused relentlessly, turning Facebook from a dorm
 #
 
 Check out the `make_scenario_2_ref_photos` folder for more context on how to build this automation
+
+#
+
+- initially use `quality: low` & `resolution: sd`
+- then use `quality: high` & `resolution: full-hd`
