@@ -1,0 +1,175 @@
+{
+  "name": "n8n_workflow_1",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -840,
+        -180
+      ],
+      "id": "17b92341-56e4-48e0-87a6-8f1c921a0323",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblCa8tSBXvrZfQik",
+          "mode": "list",
+          "cachedResultName": "Slideshow",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tblCa8tSBXvrZfQik"
+        },
+        "options": {},
+        "sort": {
+          "property": [
+            {
+              "field": "Row ID"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -620,
+        -180
+      ],
+      "id": "fe244974-8eed-41be-8a45-25a082e37f97",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"comment\": \"Slideshow\",\n  \"elements\": [\n    {\n      \"type\": \"image\",\n      \"src\": \"{{ $json.Photo[0].url }}\",\n      \"zoom\": -1,\n      \"position\": \"center-center\",\n      \"volume\": 0\n    },\n    {\n      \"type\": \"voice\",\n      \"text\": \"{{ $json.Script }}\"\n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -400,
+        -180
+      ],
+      "id": "85724b4d-7dbb-4a4a-85e9-efea9ad526b5",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.json2video.com/v2/movies",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"comment\": \"Slideshow\",\n    \"resolution\": \"instagram-story\",\n    \"quality\": \"high\",\n    \"scenes\": {{ JSON.stringify($json.scenes) }},\n    \"elements\": [\n        {\n            \"type\": \"subtitles\",\n            \"settings\": {\n                \"font-family\": \"Boldonse-Regular\",\n                \"font-url\": \"https://www.dropbox.com/scl/fi/9x84netesf7acx9d6qml4/Boldonse-Regular.ttf?rlkey=bps6ymww8oe67vcg1f4bl1uqq&st=fp5e1jic&raw=1\",\n                \"box-color\": \"#8a112d\",\n                \"font-size\": 160,\n                \"word-color\": \"#FFFFFF\",\n                \"position\": \"center-center\",\n                \"style\": \"boxed-word\",\n                \"outline-color\": \"#000000\",\n                \"outline-width\": 2,\n                \"shadow-color\": \"#000000\",\n                \"shadow-offset\": 4,\n                \"max-words-per-line\": 4\n            }\n        }\n    ]\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        40,
+        -180
+      ],
+      "id": "d1383666-2ee1-4d1a-96df-712bbb3ec9ad",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "M365ysfCRr0lASKH",
+          "name": "JSON2Video Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "scenes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        -180
+      ],
+      "id": "359abdc5-a68e-4184-9e0e-e3c306221bf2",
+      "name": "Aggregate"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5ce45367-ce56-4f0d-8692-75d0df3b9ca9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "59163ef64e1cf4dcd8e0818ffdc09c87dbd57c11199a791813b2ff3820cc01aa"
+  },
+  "id": "8az1kN68i7fffZvw",
+  "tags": []
+}
