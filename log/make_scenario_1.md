@@ -36,9 +36,8 @@ If you're not breaking things, you're not moving fast enough.
 ```
 
 ```txt - Script 3
-I coded Facebook from my dorm room on an $85 rented server, funded by a single ad.
-We never built services just to make money. We made money to build better services.
-The greatest companies grow because people care deeply about their vision.
+In a small dorm room at Harvard, Mark Zuckerberg rented a server for just $85 a month, coding Facebook himself. His philosophy was simple: ‘Don’t build services just for money. Earn money to build better services.’
+Driven by passion, Zuckerberg focused relentlessly, turning Facebook from a dorm-room idea into a worldwide platform.
 ```
 
 ```txt - Script 4
