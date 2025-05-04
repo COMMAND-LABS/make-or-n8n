@@ -1,0 +1,192 @@
+{
+  "name": "n8n_workflow_2_PART_Bb",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "cbdb3aca-f965-4d6f-91ab-0eed057344f1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        -20
+      ],
+      "id": "fe18b26f-34eb-42cc-8582-514a006f7e64",
+      "name": "Webhook",
+      "webhookId": "cbdb3aca-f965-4d6f-91ab-0eed057344f1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldJc2kA2DNuQ9aK",
+          "mode": "list",
+          "cachedResultName": "Full Script Segments",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tbldJc2kA2DNuQ9aK"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Generation ID": "={{ $json.body.data.object.id }}",
+            "Photos": "={{\n[\n    {\n        \"url\": $json.body.data.object.images[0].url,\n        \"filename\": \"photo.jpg\"\n    }\n]\n}}"
+          },
+          "matchingColumns": [
+            "Generation ID"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Row ID",
+              "displayName": "Row ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Script",
+              "displayName": "Script",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Start Time",
+              "displayName": "Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "End Time",
+              "displayName": "End Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Photos",
+              "displayName": "Photos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Final Photo",
+              "displayName": "Final Photo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Generation ID",
+              "displayName": "Generation ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Image Prompt",
+              "displayName": "Image Prompt",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -180,
+        -20
+      ],
+      "id": "50329727-8506-41f6-92e7-287055bf57d3",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c0ffa51f-6b64-4f12-99a5-1acde330afca",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "59163ef64e1cf4dcd8e0818ffdc09c87dbd57c11199a791813b2ff3820cc01aa"
+  },
+  "id": "sYEYRM4K7oAVy6vL",
+  "tags": []
+}

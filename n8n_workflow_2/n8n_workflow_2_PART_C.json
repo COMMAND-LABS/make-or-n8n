@@ -1,0 +1,220 @@
+{
+  "name": "n8n_workflow_2_PART_C",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblurB6yPWPHi9hDO",
+          "mode": "list",
+          "cachedResultName": "Full Script",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tblurB6yPWPHi9hDO"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -120,
+        -40
+      ],
+      "id": "6a3e8d77-56e0-4351-a8fc-31e372f63301",
+      "name": "Fetch full script from Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        -40
+      ],
+      "id": "56c3e673-dd61-4b75-90d3-03be315b41cc",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"comment\": \"Slideshow\",\n  \"elements\": [\n    {\n      \"type\": \"image\",\n      \"src\": \"{{ $json.Photos[0].url }}\",\n      \"zoom\": -1,\n      \"position\": \"center-center\",\n      \"duration\": {{ $json['End Time'] - $json['Start Time'] }} \n    }\n  ]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        -40
+      ],
+      "id": "933d50b9-117f-4779-8745-0061f43fa79e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.json2video.com/v2/movies",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"comment\": \"Slideshow\",\n    \"resolution\": \"instagram-story\",\n    \"quality\": \"high\",\n    \"scenes\": {{ JSON.stringify($json.scenes) }},\n    \"elements\": [\n        {\n            \"type\": \"subtitles\",\n            \"settings\": {\n                \"font-family\": \"Boldonse-Regular\",\n                \"font-url\": \"https://www.dropbox.com/scl/fi/9x84netesf7acx9d6qml4/Boldonse-Regular.ttf?rlkey=bps6ymww8oe67vcg1f4bl1uqq&st=fp5e1jic&raw=1\",\n                \"box-color\": \"#8a112d\",\n                \"font-size\": 160,\n                \"word-color\": \"#FFFFFF\",\n                \"position\": \"center-center\",\n                \"style\": \"boxed-word\",\n                \"outline-color\": \"#000000\",\n                \"outline-width\": 2,\n                \"shadow-color\": \"#000000\",\n                \"shadow-offset\": 4,\n                \"max-words-per-line\": 4\n            }\n        },\n        {\n            \"type\": \"audio\",\n            \"src\": \"{{ $('Fetch full script from Airtable').item.json['Script as Audio File'][0].url }}\"\n        }\n    ]\n}",
+        "options": {
+          "redirect": {
+            "redirect": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        760,
+        -40
+      ],
+      "id": "0d2a0a44-b062-4d0e-80e7-ed1d992067af",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "M365ysfCRr0lASKH",
+          "name": "JSON2Video Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "scenes",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        540,
+        -40
+      ],
+      "id": "2041b937-9f43-493a-a693-71c7c708fa6a",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldJc2kA2DNuQ9aK",
+          "mode": "list",
+          "cachedResultName": "Full Script Segments",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tbldJc2kA2DNuQ9aK"
+        },
+        "returnAll": false,
+        "options": {},
+        "sort": {
+          "property": [
+            {
+              "field": "Row ID"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        100,
+        -40
+      ],
+      "id": "4562a3ef-8a2d-4dda-9a90-6b03f52d92a3",
+      "name": "Fetch script segments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Fetch full script from Airtable": {
+      "main": [
+        [
+          {
+            "node": "Fetch script segments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Fetch full script from Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch script segments": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "18666026-79bc-41f2-9c03-f8341a7e94c3",
+  "meta": {
+    "instanceId": "59163ef64e1cf4dcd8e0818ffdc09c87dbd57c11199a791813b2ff3820cc01aa"
+  },
+  "id": "cRbo0jN5LaI4E4Vk",
+  "tags": []
+}

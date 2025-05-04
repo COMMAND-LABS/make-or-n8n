@@ -1,0 +1,359 @@
+{
+  "name": "n8n_workflow_2_PART_Ba",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        -100
+      ],
+      "id": "fd30c7c7-b911-4bfb-bc63-487cdfa37874",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblurB6yPWPHi9hDO",
+          "mode": "list",
+          "cachedResultName": "Full Script",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tblurB6yPWPHi9hDO"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -300,
+        -100
+      ],
+      "id": "ad1af722-ab15-4e0f-9279-72741d9cdb94",
+      "name": "Fetch full script from Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldJc2kA2DNuQ9aK",
+          "mode": "list",
+          "cachedResultName": "Full Script Segments",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tbldJc2kA2DNuQ9aK"
+        },
+        "returnAll": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -80,
+        -100
+      ],
+      "id": "cee352cb-1f99-41aa-9acf-357b1668326d",
+      "name": "Fetch script segments",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=# TASK\n\nCreate an image prompt for an #short form viral video created using AI Automation techniques. Your task is to create an image prompt that will produce and beautiful and aesthetically pleasing image for a section of the overall script\n\n## CURRENT SECTION\n\n{{ $json.Script }}\n\n## OVERALL SCRIPT\n\n{{ $('Fetch full script from Airtable').item.json.Script }}\n\n## RESPONSE FORMAT\n\nReturn the image prompt as text ready for use by a text-to-image model. No markdown. Just the text of the image prompt."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        140,
+        -100
+      ],
+      "id": "90448722-ad43-4e10-a5f2-a89b9eefd30b",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "9cR83q1r8AczelJ3",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldJc2kA2DNuQ9aK",
+          "mode": "list",
+          "cachedResultName": "Full Script Segments",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tbldJc2kA2DNuQ9aK"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Generation ID": "={{ $json.sdGenerationJob.generationId }}",
+            "id": "={{ $('Fetch script segments').item.json.id }}",
+            "Image Prompt": "={{ $('OpenAI').item.json.message.content }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Row ID",
+              "displayName": "Row ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Script",
+              "displayName": "Script",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Start Time",
+              "displayName": "Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "End Time",
+              "displayName": "End Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Photos",
+              "displayName": "Photos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Final Photo",
+              "displayName": "Final Photo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "Generation ID",
+              "displayName": "Generation ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Image Prompt",
+              "displayName": "Image Prompt",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        736,
+        -100
+      ],
+      "id": "ae06fe29-69f3-4d2f-be90-290a39444bfc",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://cloud.leonardo.ai/api/rest/v1/generations",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"modelId\": \"6b645e3a-d64f-4341-a6d8-7a3690fbf042\",\n  \"contrast\": 3.5,\n  \"prompt\": {{ JSON.stringify($json.message.content) }},\n  \"num_images\": 1,\n  \"width\": 1472,\n  \"height\": 832,\n  \"alchemy\": true,\n  \"styleUUID\": \"111dc692-d470-4eec-b791-3475abac4c46\",\n  \"enhancePrompt\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        516,
+        -100
+      ],
+      "id": "0dd25c02-c732-4847-a309-023dd5e6f48f",
+      "name": "HTTP Request1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "wvgqgm0PMYsDX8Qh",
+          "name": "Leonardo.ai Auth Header"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Fetch full script from Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch full script from Airtable": {
+      "main": [
+        [
+          {
+            "node": "Fetch script segments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch script segments": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "095ded04-5818-4d39-a946-98fceee7c49c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "59163ef64e1cf4dcd8e0818ffdc09c87dbd57c11199a791813b2ff3820cc01aa"
+  },
+  "id": "EfKGd4UmncHthqNp",
+  "tags": []
+}

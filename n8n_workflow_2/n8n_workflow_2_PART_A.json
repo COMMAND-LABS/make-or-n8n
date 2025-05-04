@@ -1,0 +1,938 @@
+{
+  "name": "n8n_workflow_2_PART_A",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -520
+      ],
+      "id": "17dc5f83-a6ff-4cd8-ba0f-85351efd7835",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "path": "=/scratch/generated_media/audio/{{ $json.data }}.mp3",
+        "binaryData": true
+      },
+      "type": "n8n-nodes-base.dropbox",
+      "typeVersion": 1,
+      "position": [
+        480,
+        -595
+      ],
+      "id": "7b4aaf78-f5e0-49c0-a950-b68c8d101f92",
+      "name": "Dropbox",
+      "credentials": {
+        "dropboxOAuth2Api": {
+          "id": "rj6rLMpl6Ju8ULyh",
+          "name": "Dropbox account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "action": "generate"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        260,
+        -595
+      ],
+      "id": "ca6d2724-3765-4ea5-92ef-bdf3caf44432",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://api.elevenlabs.io/v1/text-to-speech/dY9fWBb7TNkZB7UPeFK1",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"text\": {{ JSON.stringify($json.Script) }},\n  \"voice_settings\": {\n    \"stability\": 0.75,\n    \"similarity_boost\": 0.75\n  },\n  \"model_id\": \"eleven_multilingual_v2\"\n}",
+        "options": {
+          "response": {
+            "response": {}
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        40,
+        -520
+      ],
+      "id": "b716b666-3704-4217-a3df-b14c339812b2",
+      "name": "Synthesize voice",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "iKjmMjUpkggJ92er",
+          "name": "Eleven Labs Header Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"path\": \"{{ $json.path_display }}\",\n    \"settings\": {\n      \"requested_visibility\": \"public\"\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        700,
+        -595
+      ],
+      "id": "103841ba-b2c9-4a15-9bf7-768295aa3a58",
+      "name": "Create a share link",
+      "credentials": {
+        "dropboxOAuth2Api": {
+          "id": "rj6rLMpl6Ju8ULyh",
+          "name": "Dropbox account"
+        },
+        "oAuth2Api": {
+          "id": "nu6DxZNwkKViwGcY",
+          "name": "Custom Dropbox OAuth2 Connection"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Replace dl=0 or dl=1 with dl=1, or add it if missing\nconst originalUrl = $input.first().json.url;\nlet updatedUrl = originalUrl;\n\nif (originalUrl.includes('dl=')) {\n  updatedUrl = originalUrl.replace(/dl=\\d/, 'dl=1');\n} else {\n  updatedUrl += (originalUrl.includes('?') ? '&' : '?') + 'dl=1';\n}\n\nreturn {\n  updatedUrl\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        -595
+      ],
+      "id": "9a64f1ae-31fd-418a-b6a8-f6fc2d734c92",
+      "name": "Edit the share link"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch",
+        "useDataOfInput": 2
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        760,
+        -280
+      ],
+      "id": "22f2d1b1-78cf-4991-9a4c-76a0d93b0b4e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldJc2kA2DNuQ9aK",
+          "mode": "list",
+          "cachedResultName": "Full Script Segments",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tbldJc2kA2DNuQ9aK"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Row ID": "={{ $json.id }}",
+            "Script": "={{ $json.text }}",
+            "Start Time": "={{ $json.start }}",
+            "End Time": "={{ $json.end }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Row ID",
+              "displayName": "Row ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Script",
+              "displayName": "Script",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Start Time",
+              "displayName": "Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "End Time",
+              "displayName": "End Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Photos",
+              "displayName": "Photos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Final Photo",
+              "displayName": "Final Photo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2680,
+        -380
+      ],
+      "id": "ab6bb58a-84e5-49a1-85f8-3d7d75aad239",
+      "name": "Airtable2",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "segments",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2460,
+        -395
+      ],
+      "id": "8c1e97c5-c02b-4e56-9a68-31a71f18dabe",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/audio/transcriptions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "whisper-1"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "response_format",
+              "value": "verbose_json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1580,
+        -520
+      ],
+      "id": "74411c16-344f-4f8f-9b01-024510f21622",
+      "name": "Transcribe audio with whisper-1",
+      "credentials": {
+        "openAiApi": {
+          "id": "9cR83q1r8AczelJ3",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblurB6yPWPHi9hDO",
+          "mode": "list",
+          "cachedResultName": "Full Script",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tblurB6yPWPHi9hDO"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        -180,
+        -520
+      ],
+      "id": "751585ad-3815-4df3-8215-5ecbc5592fcc",
+      "name": "Fetch script from Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblurB6yPWPHi9hDO",
+          "mode": "list",
+          "cachedResultName": "Full Script",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tblurB6yPWPHi9hDO"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Script as Audio File": "={{\n[\n    {\n        \"url\": $json.updatedUrl,\n        \"filename\": $('Dropbox').item.json.name\n    }\n]\n}}",
+            "id": "={{ $('Fetch script from Airtable').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Script",
+              "displayName": "Script",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Script as Audio File",
+              "displayName": "Script as Audio File",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Final Video",
+              "displayName": "Final Video",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1140,
+        -595
+      ],
+      "id": "201b3341-8331-4442-8aa1-2194ea22bc9f",
+      "name": "Store the synthesize voice into Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldJc2kA2DNuQ9aK",
+          "mode": "list",
+          "cachedResultName": "Full Script Segments",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tbldJc2kA2DNuQ9aK"
+        },
+        "returnAll": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        1800,
+        -520
+      ],
+      "id": "5f2cfce9-53e5-4edc-a405-bafe01572d25",
+      "name": "See if any script segments exist in Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "f650c3ea-7379-4550-9678-40eee4035889",
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2240,
+        -445
+      ],
+      "id": "5d2b9e26-232e-4e75-ac91-e2b39ca7e032",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nlet count = 0\nfor (const item of $input.all()) {\n  count++\n}\n\nreturn {\n  \"count\": count  \n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2020,
+        -440
+      ],
+      "id": "36be9fb5-ba28-4fdc-9b44-38d45d714ef0",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2460,
+        -620
+      ],
+      "id": "b9d0abb2-eeda-431f-9ad6-046f682df312",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRecord",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldJc2kA2DNuQ9aK",
+          "mode": "list",
+          "cachedResultName": "Full Script Segments",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tbldJc2kA2DNuQ9aK"
+        },
+        "id": "={{ $json.id }}"
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        2680,
+        -620
+      ],
+      "id": "edbdf6a5-6dce-4feb-9b41-e42b2341f9c2",
+      "name": "Airtable",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2900,
+        -780
+      ],
+      "id": "111dd1f2-b6e1-4a9f-8047-01fa02759718",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "appUjhGlhz9j6D6tH",
+          "mode": "list",
+          "cachedResultName": "Make or n8n",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbldJc2kA2DNuQ9aK",
+          "mode": "list",
+          "cachedResultName": "Full Script Segments",
+          "cachedResultUrl": "https://airtable.com/appUjhGlhz9j6D6tH/tbldJc2kA2DNuQ9aK"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Row ID": "={{ $json.id }}",
+            "Script": "={{ $json.text }}",
+            "Start Time": "={{ $json.start }}",
+            "End Time": "={{ $json.end }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Row ID",
+              "displayName": "Row ID",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Script",
+              "displayName": "Script",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Start Time",
+              "displayName": "Start Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "End Time",
+              "displayName": "End Time",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "number",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Photos",
+              "displayName": "Photos",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Final Photo",
+              "displayName": "Final Photo",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.1,
+      "position": [
+        3300,
+        -640
+      ],
+      "id": "eec747e8-cd54-4128-87b3-b69acd5d1b4f",
+      "name": "Airtable3",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "JFFQDD8cZbh80GAz",
+          "name": "Make or n8n PAT"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "segments",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        3100,
+        -640
+      ],
+      "id": "2e0ed380-0ae8-4c5c-98cc-a12867151ce2",
+      "name": "Split Out1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Fetch script from Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dropbox": {
+      "main": [
+        [
+          {
+            "node": "Create a share link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "Dropbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Synthesize voice": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Create a share link": {
+      "main": [
+        [
+          {
+            "node": "Edit the share link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit the share link": {
+      "main": [
+        [
+          {
+            "node": "Store the synthesize voice into Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Transcribe audio with whisper-1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable2": {
+      "main": [
+        []
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Airtable2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe audio with whisper-1": {
+      "main": [
+        [
+          {
+            "node": "See if any script segments exist in Airtable",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch script from Airtable": {
+      "main": [
+        [
+          {
+            "node": "Synthesize voice",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store the synthesize voice into Airtable": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "See if any script segments exist in Airtable": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Airtable",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Airtable3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "56a5a408-7671-410d-9e37-4b62343c1da9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "59163ef64e1cf4dcd8e0818ffdc09c87dbd57c11199a791813b2ff3820cc01aa"
+  },
+  "id": "gKGc2J9mBnZ28evW",
+  "tags": []
+}
